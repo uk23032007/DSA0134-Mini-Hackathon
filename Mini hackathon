@@ -1,0 +1,103 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+// Abstract Class
+class Person {
+protected:
+    string name;
+    int id;
+
+public:
+    Person(string n, int i) : name(n), id(i) {}
+
+    virtual void display() = 0;
+
+    virtual ~Person() {
+        cout << "Person Destructor Called\n";
+    }
+};
+
+// Derived Class
+class Patient : public Person {
+private:
+    int age;
+
+public:
+    Patient(string n, int i, int a) : Person(n, i) {
+        age = a;
+    }
+
+    void display() override {
+        cout << "\nPatient ID: " << id
+             << "\nName: " << name
+             << "\nAge: " << age << endl;
+    }
+
+    // Operator Overloading
+    Patient operator+(int years) {
+        return Patient(name, id, age + years);
+    }
+
+    ~Patient() {
+        cout << "Patient Destructor Called\n";
+    }
+};
+
+// Another Derived Class
+class Doctor : public Person {
+private:
+    string specialization;
+
+public:
+    Doctor(string n, int i, string s) : Person(n, i) {
+        specialization = s;
+    }
+
+    void display() override {
+        cout << "\nDoctor ID: " << id
+             << "\nName: " << name
+             << "\nSpecialization: " << specialization << endl;
+    }
+
+    ~Doctor() {
+        cout << "Doctor Destructor Called\n";
+    }
+};
+
+int main() {
+    try {
+        vector<Person*> hospital;
+
+        hospital.push_back(new Patient("Rahul", 101, 25));
+        hospital.push_back(new Doctor("Priya", 201, "Cardiology"));
+
+        cout << "\n--- Hospital Records ---\n";
+
+        for (Person* p : hospital) {
+            p->display();   // Runtime Polymorphism
+        }
+
+        int patientAge;
+        cout << "\nEnter Patient Age: ";
+        cin >> patientAge;
+
+        if (patientAge < 0)
+            throw "Invalid Age Entered!";
+
+        Patient p1("Arun", 102, patientAge);
+        Patient p2 = p1 + 5;   // Operator Overloading
+
+        cout << "\nAfter 5 Years:\n";
+        p2.display();
+
+        for (Person* p : hospital)
+            delete p;   // Dynamic Memory Deallocation
+    }
+
+    catch (const char* msg) {
+        cout << "Exception: " << msg << endl;
+    }
+
+    return 0;
+}
